@@ -69,13 +69,15 @@ NationView is a digital governance platform designed to streamline tax collectio
 
 ### Citizen Dashboard
 
-![Citizen Dashboard](assets/citizen-dashboard.png)
+![Citizen Dashboard](nationview/assets/citizen-dashboard.png)
 
 ### Government Dashboard
 
-![Government Dashboard](assets/government-dashboard.png)
+![Government Dashboard](nationview/assets/government-dashboard.png)
 
-![Tax Payment](assets/tax-payment.png)
+### Tax Payment Dashboard
+
+![Tax Payment](nationview/assets/tax-payment.png)
 
 ## 🚀 Installation
 
