@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}My Taxes - NationView{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>My Tax Submissions</h2>
+        <p class="text-muted">View your tax payment history</p>
+    </div>
+    <div class="col-auto">
+        <a href="{% url 'submit_tax' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Submit New Tax
+        </a>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Tax Records</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Financial Year</th>
+                        <th>Amount</th>
+                        <th>Payment Mode</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Receipt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tax in tax_submissions %}
+                    <tr>
+                        <td>{{ tax.financial_year }}</td>
+                        <td>₹{{ tax.amount_paid }}</td>
+                        <td>{{ tax.get_payment_mode_display }}</td>
+                        <td>
+                            {% if tax.verified %}
+                                <span class="badge bg-success">Verified</span>
+                            {% else %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ tax.submission_date|date:"d M Y" }}</td>
+                        <td>
+                            <a href="{{ tax.receipt.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No tax submissions found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Tax Summary</h6>
+    </div>
+    <div class="card-body">
+        <div class="chart-bar">
+            <canvas id="myTaxChart" height="100"></canvas>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+// Tax Summary Chart
+const ctx = document.getElementById('myTaxChart').getContext('2d');
+const myTaxChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: [
+            {% for tax in tax_submissions %}
+            '{{ tax.financial_year }}',
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Tax Paid',
+            data: [
+                {% for tax in tax_submissions %}
+                {{ tax.amount_paid }},
+                {% endfor %}
+            ],
+            backgroundColor: 'rgba(78, 115, 223, 0.5)',
+            borderColor: 'rgba(78, 115, 223, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '₹' + value;
+                    }
+                }
+            }
+        },
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return '₹' + context.raw;
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}
+

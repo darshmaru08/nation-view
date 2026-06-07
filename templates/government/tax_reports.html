@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Tax Reports - NationView{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Tax Collection Reports</h2>
+        <p class="text-muted">View and analyze tax collection data</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Tax Collection Overview</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-area">
+                    <canvas id="taxCollectionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Recent Tax Submissions</h6>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for tax in recent_taxes %}
+                    <div class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">PAN: {{ tax.pan_number }}</h6>
+                            <small>{{ tax.submission_date|timesince }} ago</small>
+                        </div>
+                        <p class="mb-1">₹{{ tax.amount_paid }} for {{ tax.financial_year }}</p>
+                        <small class="text-muted">{{ tax.get_payment_mode_display }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">All Tax Submissions</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>PAN</th>
+                        <th>Amount</th>
+                        <th>Financial Year</th>
+                        <th>Payment Mode</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tax in tax_submissions %}
+                    <tr>
+                        <td>{{ tax.pan_number }}</td>
+                        <td>₹{{ tax.amount_paid }}</td>
+                        <td>{{ tax.financial_year }}</td>
+                        <td>{{ tax.get_payment_mode_display }}</td>
+                        <td>{{ tax.submission_date|date:"d M Y" }}</td>
+                        <td>
+                            {% if tax.verified %}
+                                <span class="badge bg-success">Verified</span>
+                            {% else %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+// Tax Collection Chart
+const ctx = document.getElementById('taxCollectionChart').getContext('2d');
+const taxCollectionChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        datasets: [{
+            label: 'Tax Collected (₹)',
+            data: [120000, 190000, 300000, 250000, 220000, 300000, 280000, 400000, 350000, 380000, 420000, 500000],
+            backgroundColor: 'rgba(78, 115, 223, 0.05)',
+            borderColor: 'rgba(78, 115, 223, 1)',
+            pointBackgroundColor: 'rgba(78, 115, 223, 1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(78, 115, 223, 1)',
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            fill: true,
+            tension: 0.3
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return '₹' + context.raw.toLocaleString();
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '₹' + value.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

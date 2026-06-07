@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Fund Tracker - NationView{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Fund Tracker</h2>
+        <p class="text-muted">See how tax funds are being allocated</p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h4>Allocation Breakdown</h4>
+    </div>
+    <div class="card-body">
+        <canvas id="allocationChart" height="200"></canvas>
+    </div>
+</div>
+
+<div class="row">
+    {% for allocation in allocations %}
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                {{ allocation.get_department_display }}
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">₹{{ allocation.allocated_amount }}</h5>
+                <p class="card-text">{{ allocation.description }}</p>
+                <p class="text-muted">Region: {{ allocation.region }}</p>
+                {% if allocation.supporting_document %}
+                <a href="{{ allocation.supporting_document.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                    View Document
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-footer text-muted">
+                Allocated on {{ allocation.allocation_date|date:"d M Y" }}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% block scripts %}
+<script>
+// Allocation Chart
+const ctx = document.getElementById('allocationChart').getContext('2d');
+const chart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: [
+            {% for allocation in allocations %}
+            '{{ allocation.get_department_display }}',
+            {% endfor %}
+        ],
+        datasets: [{
+            data: [
+                {% for allocation in allocations %}
+                {{ allocation.allocated_amount }},
+                {% endfor %}
+            ],
+            backgroundColor: [
+                '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796'
+            ],
+            hoverBorderColor: "rgba(234, 236, 244, 1)",
+        }],
+    },
+    options: {
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'right',
+            },
+        },
+    },
+});
+</script>
+{% endblock %}
+{% endblock %}

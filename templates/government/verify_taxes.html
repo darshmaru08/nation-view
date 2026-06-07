@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-check-circle text-primary me-2"></i>
+            Tax Verification Dashboard
+        </h2>
+        <div>
+            <span class="badge bg-info text-dark">
+                Pending: {{ taxes.count }}
+            </span>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {% if taxes %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>PAN Number</th>
+                            <th>User</th>
+                            <th>Amount</th>
+                            <th>Year</th>
+                            <th>Payment Mode</th>
+                            <th>Date</th>
+                            <th>Receipt</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tax in taxes %}
+                        <tr>
+                            <td>{{ tax.pan_number }}</td>
+                            <td>{{ tax.user.get_full_name|default:tax.user.username }}</td>
+                            <td class="fw-bold">₹{{ tax.amount_paid }}</td>
+                            <td>{{ tax.financial_year }}</td>
+                            <td>
+                                <span class="badge bg-{% if tax.payment_mode == 'online' %}success{% elif tax.payment_mode == 'cheque' %}info{% else %}secondary{% endif %}">
+                                    {{ tax.get_payment_mode_display }}
+                                </span>
+                            </td>
+                            <td>{{ tax.submission_date|date:"d M Y" }}</td>
+                            <td>
+                                {% if tax.receipt %}
+                                <a href="{{ tax.receipt.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-file-pdf"></i> View
+                                </a>
+                                {% else %}
+                                <span class="text-muted">None</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <form method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="tax_id" value="{{ tax.id }}">
+                                        <button type="submit" name="action" value="verify" 
+                                                class="btn btn-sm btn-success"
+                                                title="Verify Payment">
+                                            <i class="fas fa-check"></i> Verify
+                                        </button>
+                                    </form>
+                                    <form method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="tax_id" value="{{ tax.id }}">
+                                        <button type="submit" name="action" value="reject" 
+                                                class="btn btn-sm btn-danger"
+                                                title="Reject Submission">
+                                            <i class="fas fa-times"></i> Reject
