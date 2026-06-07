@@ -65,7 +65,7 @@ NationView is a digital governance platform designed to streamline tax collectio
 
 ### Home Page
 
-![Home](assets/home.png)
+![Home](assets/homepage.png)
 
 ### Citizen Dashboard
 
@@ -75,10 +75,12 @@ NationView is a digital governance platform designed to streamline tax collectio
 
 ![Government Dashboard](assets/government-dashboard.png)
 
+![Tax Payment](assets/tax-payment.png)
+
 ## 🚀 Installation
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/darshmaru08/nation-view
 cd nation-view
 
 python -m venv venv
@@ -113,4 +115,4 @@ http://127.0.0.1:8000/admin/
 
 Darsh Maru
 
-GitHub: https://github.com/YOUR_USERNAME
+GitHub: https://github.com/darshmaru08
