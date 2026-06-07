@@ -20,3 +20,5 @@ Thumbs.db
 
 # Deployment
 staticfiles/
+
+*.zip
